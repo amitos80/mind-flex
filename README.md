@@ -1,24 +1,49 @@
-<div align="center">
+# MindFlex
 
-<picture>
-    <source media="(prefers-color-scheme: dark)" srcset="https://github.com/user-attachments/assets/99cb6303-64e4-4bed-bf3f-35735353e6de" />
-    <source media="(prefers-color-scheme: light)" srcset="https://github.com/user-attachments/assets/a5dbf71c-c509-4c4f-80f4-be88a1943b0a" />
-    <img alt="Logo" src="https://github.com/user-attachments/assets/99cb6303-64e4-4bed-bf3f-35735353e6de" />
-</picture>
+**Cognitive training through your everyday browsing.**
+
+MindFlex is a Chrome extension that scans web pages for complex words, masks portions of them, and challenges you to complete the word based on context — a seamless brain exercise woven into your normal reading flow.
 
 ![](https://img.shields.io/badge/React-61DAFB?style=flat-square&logo=react&logoColor=black)
 ![](https://img.shields.io/badge/Typescript-3178C6?style=flat-square&logo=typescript&logoColor=white)
 ![](https://badges.aleen42.com/src/vitejs.svg)
 
-![GitHub action badge](https://github.com/Jonghakseo/chrome-extension-boilerplate-react-vite/actions/workflows/build-zip.yml/badge.svg)
-![GitHub action badge](https://github.com/Jonghakseo/chrome-extension-boilerplate-react-vite/actions/workflows/lint.yml/badge.svg)
+## How It Works
 
-<a href="https://discord.gg/4ERQ6jgV9a" target="_blank"><img src="https://discord.com/api/guilds/1263404974830915637/widget.png"/></a>
+1. The extension scans page text for words above a configurable length threshold.
+2. A portion of each word is hidden based on your selected difficulty (Easy / Medium / Hard).
+3. Clicking a masked word opens a three-option popover — the correct completion plus two distractors.
+4. Correct answers are tracked as a session score (per page) and an all-time total.
 
-> This boilerplate
-> has [Legacy version](https://github.com/Jonghakseo/chrome-extension-boilerplate-react-vite/tree/legacy)
+## Difficulty Levels
 
-</div>
+| Level | Hidden portion |
+|---|---|
+| Easy | Last 2 characters |
+| Medium | Last 50% of the word |
+| Hard | All except the first character |
+
+## Project Structure
+
+```
+packages/word-processor/   — Word detection, masking, and distractor generation
+packages/storage/          — Chrome storage schemas (settings + scores)
+pages/content/             — DOM scanner, word injector, mutation observer
+pages/content-ui/          — React UI: choice popover + feedback overlay (Shadow DOM)
+pages/popup/               — Extension popup: toggle, difficulty, session score
+pages/options/             — Options page: difficulty, word length, score reset
+tests/word-processor/      — Vitest unit tests for the word-processor package
+```
+
+## Getting Started
+
+```bash
+pnpm install
+pnpm dev        # watch mode
+pnpm build      # production build -> dist/
+```
+
+Load `dist/` as an unpacked extension in Chrome (`chrome://extensions`).
 
 > [!NOTE]
 > This project is listed in the [Awesome Vite](https://github.com/vitejs/awesome-vite)

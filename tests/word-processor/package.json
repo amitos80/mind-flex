@@ -1,0 +1,21 @@
+{
+  "name": "@extension/word-processor-tests",
+  "version": "0.5.0",
+  "description": "Unit tests for the MindFlex word-processor package",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "clean:node_modules": "pnpx rimraf node_modules",
+    "clean:turbo": "rimraf .turbo",
+    "clean": "pnpm clean:turbo && pnpm clean:node_modules"
+  },
+  "dependencies": {
+    "@extension/word-processor": "workspace:*"
+  },
+  "devDependencies": {
+    "@extension/tsconfig": "workspace:*",
+    "vitest": "^3.2.4"
+  }
+}

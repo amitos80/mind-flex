@@ -1,18 +1,82 @@
-import { t } from '@extension/i18n';
-import { ToggleButton } from '@extension/ui';
-import { useEffect } from 'react';
+import { mindFlexScoreStorage } from '@extension/storage';
+import { ChoicePopover } from '@src/components/ChoicePopover';
+import { GameFeedback } from '@src/components/GameFeedback';
+import { MINDFLEX_WORD_CLICK_EVENT } from '@src/events';
+import { useCallback, useEffect, useState } from 'react';
+import type { WordChallenge } from '@extension/word-processor';
+import type { WordClickPayload } from '@src/events';
 
+interface ActiveChallenge {
+  challenge: WordChallenge;
+  rect: DOMRect;
+  spanID: string;
+}
+
+interface FeedbackState {
+  correct: boolean;
+  rect: DOMRect;
+}
+
+/**
+ * Root UI component injected into every page via the content-ui shadow DOM.
+ * Listens for word-click events dispatched by the content script and renders
+ * the choice popover and result feedback overlay.
+ */
 export default function App() {
+  const [active, setActive] = useState<ActiveChallenge | null>(null);
+  const [feedback, setFeedback] = useState<FeedbackState | null>(null);
+
   useEffect(() => {
-    console.log('[CEB] Content ui all loaded');
+    const handler = (e: Event) => {
+      const { challenge, rect, spanID } = (e as CustomEvent<WordClickPayload>).detail;
+      setActive({ challenge, rect, spanID });
+    };
+
+    document.addEventListener(MINDFLEX_WORD_CLICK_EVENT, handler);
+    return () => document.removeEventListener(MINDFLEX_WORD_CLICK_EVENT, handler);
   }, []);
 
+  const handleAnswer = useCallback(
+    async (correct: boolean) => {
+      if (!active) return;
+
+      setFeedback({ correct, rect: active.rect });
+      setActive(null);
+
+      if (correct) {
+        await mindFlexScoreStorage.set(prev => ({
+          sessionScore: prev.sessionScore + 1,
+          totalScore: prev.totalScore + 1,
+        }));
+      }
+
+      // Visually resolve the span: replace placeholder text with the answer.
+      const span = document.getElementById(active.spanID);
+      if (span) {
+        span.textContent = active.challenge.original;
+        span.style.borderBottom = correct ? '2px solid #22c55e' : '2px solid #ef4444';
+        span.style.backgroundColor = correct ? '#dcfce7' : '#fee2e2';
+        span.style.cursor = 'default';
+        span.removeAttribute('role');
+      }
+    },
+    [active],
+  );
+
+  const handleClose = useCallback(() => setActive(null), []);
+  const handleFeedbackDone = useCallback(() => setFeedback(null), []);
+
   return (
-    <div className="flex items-center justify-between gap-2 rounded bg-blue-100 px-2 py-1">
-      <div className="flex gap-1 text-sm text-blue-500">
-        Edit <strong className="text-blue-700">pages/content-ui/src/matches/all/App.tsx</strong> and save to reload.
-      </div>
-      <ToggleButton className={'mt-0'}>{t('toggleTheme')}</ToggleButton>
-    </div>
+    <>
+      {active && (
+        <ChoicePopover
+          challenge={active.challenge}
+          anchorRect={active.rect}
+          onAnswer={handleAnswer}
+          onClose={handleClose}
+        />
+      )}
+      {feedback && <GameFeedback correct={feedback.correct} anchorRect={feedback.rect} onDone={handleFeedbackDone} />}
+    </>
   );
 }

@@ -1,18 +1,25 @@
-# Content Script
+# MindFlex Content Script
 
-This tool allows you to inject Console Scripts into all pages specified by you.
+This content script runs on every web page and is responsible for:
 
-https://developer.chrome.com/docs/extensions/develop/concepts/content-scripts
+1. **DOM Scanning** — walks text nodes to find complex words that meet the minimum length threshold (`dom-scanner.ts`)
+2. **Word Injection** — replaces qualifying words with interactive masked spans (`word-injector.ts`)
+3. **Mutation Observation** — rescans newly added DOM nodes for SPA-style page updates (`mutation-observer.ts`)
+4. **Settings Sync** — listens for messages from the popup to apply difficulty/enabled changes in real-time
 
-### Add New Script
+## Entry Point
 
-1. Copy `matches/example` folder and paste it with other name and edit content.
-2. Edit `manifest.ts`:
-- In `content-scripts` section add object with:
+`src/matches/all/index.ts` — runs on all `http://` and `https://` pages.
 
-```ts
-{
-  matches: ['URL_FOR_INJECT'], 
-  js: ['content/{matches_folder_name}.iife.js']
-}
-```
+## Events
+
+The content script dispatches a `mindflex:word-click` custom event on `document` when a masked word span is clicked. The `content-ui` shadow DOM listens for this event to display the choice popover.
+
+## Key Files
+
+| File | Responsibility |
+|---|---|
+| `src/dom-scanner.ts` | `TreeWalker`-based text node scanner |
+| `src/word-injector.ts` | DOM mutation to inject `<span data-mindflex-word>` elements |
+| `src/mutation-observer.ts` | Debounced `MutationObserver` for dynamic content |
+| `src/matches/all/index.ts` | Wires everything together, handles Chrome messages |

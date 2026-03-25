@@ -1,3 +1,4 @@
-export const sampleFunction = () => {
-  console.log('content script - sampleFunction() called from another module');
+/** @deprecated This file is retained for build compatibility only. */
+export const sampleFunction = (): void => {
+  // intentionally empty
 };

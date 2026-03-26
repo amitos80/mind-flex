@@ -9,7 +9,7 @@ interface GameFeedbackProps {
   anchorRect: DOMRect;
 }
 
-const FEEDBACK_DURATION_MS = 900;
+const FEEDBACK_DURATION_MS = 1350;
 
 const CONFETTI_COLORS = ['#3b82f6', '#22c55e', '#f59e0b', '#8b5cf6', '#ec4899', '#06b6d4'];
 const PARTICLE_COUNT = 18;
@@ -17,10 +17,11 @@ const PARTICLE_COUNT = 18;
 /**
  * Pre-computed particle trajectories so the animation values are stable across
  * re-renders without relying on random numbers inside JSX.
+ * Distances are 20% larger than the original 44/58/72 values.
  */
 const PARTICLES = Array.from({ length: PARTICLE_COUNT }, (_, i) => {
   const angle = (i / PARTICLE_COUNT) * Math.PI * 2;
-  const dist = 44 + (i % 3) * 14;
+  const dist = 53 + (i % 3) * 17;
   return {
     dx: Math.round(Math.cos(angle) * dist),
     dy: Math.round(Math.sin(angle) * dist),
@@ -43,6 +44,13 @@ const CONFETTI_KEYFRAMES = `
     0%   { opacity: 0.85; }
     60%  { opacity: 0.85; }
     100% { opacity: 0; }
+  }
+  @keyframes mf-breathe {
+    0%   { opacity: 0;    }
+    20%  { opacity: 0.75; }
+    50%  { opacity: 0.3;  }
+    75%  { opacity: 0.7;  }
+    100% { opacity: 0;    }
   }
 `;
 
@@ -80,8 +88,10 @@ export const GameFeedback = ({ correct, onDone, anchorRect }: GameFeedbackProps)
           width: Math.max(anchorRect.width, 24),
           height: Math.max(anchorRect.height, 18),
           borderRadius: '4px',
-          background: correct ? '#86efac' : '#fca5a5',
-          animation: `mf-flash ${FEEDBACK_DURATION_MS}ms ease forwards`,
+          background: correct ? '#86efac' : '#f87171',
+          animation: correct
+            ? `mf-flash ${FEEDBACK_DURATION_MS}ms ease forwards`
+            : `mf-breathe ${FEEDBACK_DURATION_MS}ms cubic-bezier(0.45, 0, 0.55, 1) forwards`,
           pointerEvents: 'none',
           zIndex: 2147483646,
         }}
@@ -95,10 +105,10 @@ export const GameFeedback = ({ correct, onDone, anchorRect }: GameFeedbackProps)
             style={
               {
                 position: 'absolute',
-                top: cy - 4,
-                left: cx - 4,
-                width: 8,
-                height: 8,
+                top: cy - 5,
+                left: cx - 5,
+                width: 10,
+                height: 10,
                 borderRadius: p.shape === 0 ? '50%' : p.shape === 1 ? '0' : '2px',
                 background: p.color,
                 pointerEvents: 'none',

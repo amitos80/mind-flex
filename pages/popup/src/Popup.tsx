@@ -47,7 +47,7 @@ const Popup = () => {
           aria-label="Toggle MindFlex">
           <span
             className={`absolute top-0.5 h-6 w-6 rounded-full bg-white shadow transition-transform duration-200 ${
-              settings.enabled ? 'translate-x-5' : 'translate-x-0.5'
+              settings.enabled ? 'translate-left-1' : 'translate-left-0'
             }`}
           />
         </button>

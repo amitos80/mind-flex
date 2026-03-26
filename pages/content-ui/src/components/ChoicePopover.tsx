@@ -24,7 +24,7 @@ const shuffle = <T,>(arr: T[]): T[] => {
 
 /**
  * A floating bubble popover presenting three completion choices for a masked
- * word.  Positioned above the triggering span using the provided bounding rect.
+ * word. Positioned above the triggering span using the provided bounding rect.
  * Closes when the user clicks outside or presses Escape.
  */
 export const ChoicePopover = ({ challenge, anchorRect, onAnswer, onClose }: ChoicePopoverProps) => {
@@ -36,19 +36,28 @@ export const ChoicePopover = ({ challenge, anchorRect, onAnswer, onClose }: Choi
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === 'Escape') onClose();
     };
-    const handleClickOutside = (e: MouseEvent) => {
-      if (ref.current && !ref.current.contains(e.target as Node)) onClose();
+
+    /**
+     * WHY: composedPath() instead of e.target — the popover lives inside a
+     * shadow DOM. When events bubble across the shadow boundary the browser
+     * retargets e.target to the shadow host, so ref.current.contains(e.target)
+     * always returns false for clicks inside the popover, which incorrectly
+     * fires onClose() before the button's own click handler can run.
+     * composedPath() returns the full path including shadow-DOM internals and
+     * is never retargeted, so the containment check works correctly.
+     */
+    const handleMouseDown = (e: MouseEvent) => {
+      if (ref.current && !e.composedPath().includes(ref.current)) onClose();
     };
 
     document.addEventListener('keydown', handleKeyDown);
-    document.addEventListener('mousedown', handleClickOutside);
+    document.addEventListener('mousedown', handleMouseDown);
     return () => {
       document.removeEventListener('keydown', handleKeyDown);
-      document.removeEventListener('mousedown', handleClickOutside);
+      document.removeEventListener('mousedown', handleMouseDown);
     };
   }, [onClose]);
 
-  // Position the popover above the anchor span, accounting for scroll.
   const top = anchorRect.top + window.scrollY - 8;
   const left = anchorRect.left + window.scrollX + anchorRect.width / 2;
 

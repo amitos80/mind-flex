@@ -1,6 +1,21 @@
 /** Cognitive challenge difficulty level controlling how much of a word is hidden. */
 export type Difficulty = 'easy' | 'medium' | 'hard';
 
+/** Identifies which app variant is running. */
+export type MindFlexMode = 'senior' | 'junior';
+
+/** Runtime configuration injected per-app to parameterize core logic. */
+export interface MindFlexConfig {
+  /** Which product variant is active. */
+  mode: MindFlexMode;
+  /** Tailwind theme key applied at the UI layer. */
+  theme: 'senior' | 'junior';
+  /** Minimum word length (in chars) before masking is attempted. */
+  wordLengthThreshold: number;
+  /** Whether contextual hints are shown alongside the challenge. */
+  hintEnabled: boolean;
+}
+
 /**
  * A word candidate found during DOM text scanning.
  * Positions are byte offsets within the scanned text node value.

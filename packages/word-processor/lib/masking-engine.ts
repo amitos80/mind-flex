@@ -1,4 +1,7 @@
-import type { Difficulty, MaskedWord } from './types.js';
+import type { Difficulty, MaskedWord, MindFlexConfig } from './types.js';
+
+/** Omits the threshold check — all words qualify. Used as the no-config default. */
+const NO_THRESHOLD = 0;
 
 /**
  * Computes the number of trailing characters to hide for a given difficulty.
@@ -22,14 +25,19 @@ const hiddenCharCount = (wordLength: number, difficulty: Difficulty): number => 
 };
 
 /**
- * Applies a masking strategy to a word based on the requested difficulty level.
- * The hidden portion is always taken from the word's trailing characters.
+ * Applies a masking strategy to a word based on difficulty and an optional config.
+ * Returns `null` when `config.wordLengthThreshold` is set and the word is too short.
+ * Without a config the original two-argument behaviour is preserved.
  *
  * @param word - The original, unmasked word.
  * @param difficulty - The difficulty level to apply.
- * @returns A {@link MaskedWord} where `visible + hidden === original`.
+ * @param config - Optional {@link MindFlexConfig}; enables per-mode threshold filtering.
+ * @returns A {@link MaskedWord} or `null` if the word is below the configured threshold.
  */
-export const maskWord = (word: string, difficulty: Difficulty): MaskedWord => {
+export const maskWord = (word: string, difficulty: Difficulty, config?: MindFlexConfig): MaskedWord | null => {
+  const threshold = config?.wordLengthThreshold ?? NO_THRESHOLD;
+  if (word.length < threshold) return null;
+
   const count = hiddenCharCount(word.length, difficulty);
   const splitAt = word.length - count;
 

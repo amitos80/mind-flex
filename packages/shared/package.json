@@ -23,6 +23,7 @@
     "postinstall": "pnpm ready"
   },
   "dependencies": {
+    "@extension/word-processor": "workspace:*",
     "react-error-boundary": "^6.0.0"
   },
   "devDependencies": {

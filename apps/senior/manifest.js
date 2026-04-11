@@ -1,8 +1,5 @@
 import { readFileSync } from 'node:fs';
-import type { ManifestType } from '@extension/shared';
-
 const packageJson = JSON.parse(readFileSync('./package.json', 'utf8'));
-
 /**
  * @prop default_locale
  * if you want to support multiple languages, you can use the following reference
@@ -21,10 +18,10 @@ const packageJson = JSON.parse(readFileSync('./package.json', 'utf8'));
 const manifest = {
   manifest_version: 3,
   default_locale: 'en',
-  name: 'MindFlex',
+  name: 'MindFlex: Cognitive Training',
   browser_specific_settings: {
     gecko: {
-      id: 'mindflex@mindflex.app',
+      id: 'mindflex-senior@mindflex.app',
       strict_min_version: '109.0',
     },
   },
@@ -40,10 +37,10 @@ const manifest = {
   },
   action: {
     default_popup: 'popup/index.html',
-    default_icon: 'icon-34.png',
+    default_icon: 'icon-senior-34.png',
   },
   icons: {
-    '128': 'icon-128.png',
+    128: 'icon-senior-128.png',
   },
   content_scripts: [
     {
@@ -61,10 +58,9 @@ const manifest = {
   ],
   web_accessible_resources: [
     {
-      resources: ['*.js', '*.css', '*.svg', 'icon-128.png', 'icon-34.png'],
+      resources: ['*.js', '*.css', '*.svg', 'icon-senior-128.png', 'icon-senior-34.png'],
       matches: ['*://*/*'],
     },
   ],
-} satisfies ManifestType;
-
+};
 export default manifest;

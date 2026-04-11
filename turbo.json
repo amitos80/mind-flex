@@ -18,7 +18,17 @@
     },
     "build": {
       "dependsOn": ["ready", "^build"],
-      "outputs": ["../../dist/**", "dist/**"],
+      "outputs": ["../../dist/**", "../../dist-senior/**", "../../dist-junior/**", "dist/**"],
+      "cache": false
+    },
+    "@mindflex/senior#build": {
+      "dependsOn": ["ready", "^build"],
+      "outputs": ["../../dist-senior/**"],
+      "cache": false
+    },
+    "@mindflex/junior#build": {
+      "dependsOn": ["ready", "^build"],
+      "outputs": ["../../dist-junior/**"],
       "cache": false
     },
     "e2e": {

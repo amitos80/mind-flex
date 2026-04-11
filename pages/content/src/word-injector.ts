@@ -64,6 +64,11 @@ const injectMaskedWords = (scannedNodes: ScannedNode[], difficulty: Difficulty):
       }
 
       const challenge = buildChallenge(candidate.word, difficulty);
+      if (challenge === null) {
+        fragment.appendChild(document.createTextNode(candidate.word));
+        cursor = candidate.end;
+        continue;
+      }
       fragment.appendChild(createMaskedSpan(challenge));
       cursor = candidate.end;
     }
